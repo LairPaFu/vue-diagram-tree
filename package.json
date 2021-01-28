@@ -1,0 +1,15 @@
+{
+  "name": "vue-diagram-tree",
+  "version": "0.1.0",
+  "description": "树状关系图",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "<f1954795842@163.com>",
+  "license": "ISC"
+}
