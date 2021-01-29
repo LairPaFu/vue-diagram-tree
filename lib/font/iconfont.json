@@ -1,10 +1,17 @@
 {
-  "id": "",
-  "name": "",
+  "id": "2352591",
+  "name": "add",
   "font_family": "iconfont",
   "css_prefix_text": "icon-",
   "description": "",
   "glyphs": [
+    {
+      "icon_id": "2116276",
+      "name": "删除",
+      "font_class": "dustbin_icon",
+      "unicode": "e659",
+      "unicode_decimal": 58969
+    },
     {
       "icon_id": "4678342",
       "name": "add",

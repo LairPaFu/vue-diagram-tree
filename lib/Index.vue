@@ -41,6 +41,7 @@
           :factor="factor"
           @clickNode="clickNode"
           @showOption="showOption"
+          @deleteNode="deleteNode"
           @addNode="addNode"
         ></Node>
       </div>
@@ -297,7 +298,7 @@ export default {
           this.idAdd(data.children, this.selectTree.id);
           let save = JSON.parse(JSON.stringify(data.children));
           data.children = [];
-          let set = this.options.filter((v) => {
+          let set = JSON.parse(JSON.stringify(this.options)).filter((v) => {
             return v.name == event;
           })[0].default;
           set.id = this.selectTree.id + "1";
@@ -315,7 +316,7 @@ export default {
               res = res[index[i]].children;
             }
           }
-          let set = this.options.filter((v) => {
+          let set = JSON.parse(JSON.stringify(this.options)).filter((v) => {
             return v.name == event;
           })[0].default;
           set.id = this.selectTree.id + "1";
@@ -559,6 +560,46 @@ export default {
         this.setNode = res;
         this.changeNode(data);
       }
+    },
+    // 删除节点
+    deleteNode( tree) {
+      let index = this.getArray(tree.id);
+      let data = JSON.parse(JSON.stringify(this.datas));
+      let res = data.children;
+      for (let i = 0; i < index.length; i++) {
+        if (index.length > 1) {
+          if (i < index.length - 2) {
+            res = res[index[i]].children;
+          } else {
+            res = res[index[i]];
+            break;
+          }
+        } else if (index.length == 1) {
+          res = data;
+        }
+      }
+      if (tree.type == "task-node" && res.children.length <= 2) {
+        if (res.children.findIndex((v) => v.id == tree.id) == 0) {
+          if (res.children[1].children) {
+            res.children = res.children[1].children;
+          } else {
+            res.children = [];
+          }
+        } else {
+          if (res.children[0].children) {
+            res.children = res.children[0].children;
+          } else {
+            res.children = [];
+          }
+        }
+      } else {
+        res.children.splice(
+          res.children.findIndex((v) => v.id == tree.id),
+          1
+        );
+      }
+
+      this.changeNode(data);
     },
   },
 };

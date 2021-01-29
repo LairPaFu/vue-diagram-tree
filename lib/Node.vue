@@ -66,6 +66,12 @@
         <div v-if="tree.children && tree.children.length > 1" class="factor">
           <button @click.stop="addNode(tree)">添加条件</button>
         </div>
+        <div class="delete" v-if="tree.id != '1'">
+          <span
+            class="iconfont icon-dustbin_icon"
+            @click.stop="deleteNode(tree)"
+          ></span>
+        </div>
       </div>
     </div>
     <div
@@ -88,6 +94,7 @@
           :factor="factor"
           @clickNode="clickNode"
           @showOption="showOption"
+          @deleteNode="deleteNode"
           @addNode="addNode"
         ></Node>
       </div>
@@ -129,6 +136,10 @@ export default {
     // 添加条件
     addNode(tree) {
       this.$emit("addNode", tree);
+    },
+    // 删除节点
+    deleteNode(tree) {
+      this.$emit("deleteNode", tree);
     },
   },
 };
@@ -207,6 +218,33 @@ export default {
 .diagram-tree-node-label > div .add button span {
   font-size: 12px;
 }
+.diagram-tree-node-label > div .delete {
+  display: none;
+  z-index: 999;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 100%;
+  height: 25px;
+  line-height: 25px;
+  padding: 0;
+  cursor: pointer;
+  text-align: center;
+}
+.diagram-tree-node-label > div .delete span {
+  color: #e6e6e6;
+  font-size: 12px;
+}
+.diagram-tree-node-label > div .delete span:hover {
+  color: #fff;
+}
+.diagram-tree-node-label > .task-node .delete span {
+  color: #0059ff;
+  font-size: 12px;
+}
+.diagram-tree-node-label > .task-node .delete span:hover {
+  color: #4a89ff;
+}
 .diagram-tree-node-label > div .add button:hover {
   background-color: #3b7ffd;
 }
@@ -264,6 +302,9 @@ export default {
 }
 .diagram-tree-node-label:hover {
   border: 1px solid #0077ff;
+}
+.diagram-tree-node-label:hover .delete {
+  display: block;
 }
 .diagram-tree-node-children {
   padding-top: 40px;
