@@ -194,7 +194,7 @@ export default {
   height: 100%;
 }
 .diagram-tree-node-label > div .add {
-  z-index: 999;
+  z-index: 89;
   position: absolute;
   bottom: -13px;
   left: 50%;
@@ -220,7 +220,7 @@ export default {
 }
 .diagram-tree-node-label > div .delete {
   display: none;
-  z-index: 999;
+  z-index: 89;
   position: absolute;
   top: 0px;
   right: 0px;
@@ -249,7 +249,7 @@ export default {
   background-color: #3b7ffd;
 }
 .diagram-tree-node-label > div .factor {
-  z-index: 999;
+  z-index: 89;
   position: absolute;
   bottom: -53px;
   left: 50%;
