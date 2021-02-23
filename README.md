@@ -239,6 +239,7 @@ methods: {
 <diagram-tree
   :factor="factor"
   @clickNode="clickNode"
+  @drawerClose="drawerClose"
 ></diagram-tree>
 ```
 
@@ -266,6 +267,9 @@ methods: {
   clickNode(data) {
     console.log(data);
   },
+  drawerClose(){
+    console.log('关闭遮罩');
+  }
 }
 ```
 

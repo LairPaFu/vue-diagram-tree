@@ -28,7 +28,7 @@
       </div>
     </div>
     <div v-if="selectTree != null && drawer" class="drawer-box">
-      <div class="drawer-mask" @click="drawer = false"></div>
+      <div class="drawer-mask" @click="drawerClose"></div>
       <div class="drawer">
         <div class="title">
           <template v-if="selectTree.type == 'task-node'">
@@ -545,6 +545,11 @@ export default {
 
       this.changeNode(data);
     },
+    // 关闭遮罩
+    drawerClose(){
+      this.drawer = false
+      this.$emit('drawerClose')
+    }
   },
 };
 </script>
