@@ -607,7 +607,7 @@ export default {
   box-shadow: 0 1px 5px #00000026;
 }
 .drawer-box {
-  z-index: 9999;
+  z-index: 99;
   position: absolute;
   top: 0;
   left: 0;
