@@ -47,7 +47,7 @@
         </div>
         <div class="content">
           <template v-if="tree.type == 'task-node' && tree.factor.length > 0">
-            {{ tree.factor.join(" ") }}
+            {{ tree.factor.join(";") }}
           </template>
           <template
             v-else-if="tree.type == 'task-node' && tree.factor.length == 0"

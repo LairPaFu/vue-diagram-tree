@@ -38,19 +38,23 @@ methods: {
 ```
 <diagram-tree
   :data="data"
+  :Ddrawer="Ddrawer"
   @changeNode="changeNode"
   @clickNode="clickNode"
-></diagram-tree>
+>
+  <div>条件</div>
+</diagram-tree>
 ```
 
 #### 引入组件
+
+#### Ddrawer 遮罩内容
 
 ```
 data = {
   id: "1",
   type: "sponsor",
   sponsor: ["pafu"],
-  setting: [],
   children: [],
 }
 ```
@@ -98,7 +102,6 @@ data = {
   id: "1",
   type: "sponsor",
   sponsor: ["pafu"],
-  setting: [],
   children: [
     {
       id: "11",
@@ -110,7 +113,6 @@ data = {
           id: "111",
           type: "examiner",
           examiner: ["pafu"],
-          setting: [],
         }
       ]
     }
@@ -129,7 +131,6 @@ options : [
     default: {
       type: "notifier",
       notifier: [],
-      setting: [],
     },
   },
   {
@@ -139,7 +140,6 @@ options : [
     default: {
       type: "examiner",
       examiner: [],
-      setting: [],
     },
   },
   {
@@ -149,7 +149,6 @@ options : [
     default: {
       type: "handler",
       handler: [],
-      setting: [],
     },
   },
 ];
@@ -170,7 +169,6 @@ options : [
 | :------: | :---------------------------------------- |
 |   type   | 对应流程配置项 name                       |
 |  \$name  | 属性名对应流程配置项 name，用于显示的内容 |
-| setting  | 配置项属性设置                            |
 | children | 子节点                                    |
 
 ```
@@ -202,7 +200,6 @@ data = {
   id: "1",
   type: "pafu",
   pafu: ["pafu"],
-  setting: [],
   children: [],
 }
 ```
@@ -218,7 +215,6 @@ others : [
     default: {
       type: "pafu",
       pafu: [],
-      setting: [],
     },
   },
 ];
@@ -251,26 +247,14 @@ methods: {
 ```
 factor: [
   {
-    type: "select",
-    name: "task",
     title: "选择任务",
     value: "2",
-    option: [
-      {
-        key: "1",
-        value: "跑步",
-      },
-      {
-        key: "2",
-        value: "打球",
-      },
-    ],
+    ...
   },
   {
-    type: "input",
-    name: "time_input",
     title: "简介",
     value: "",
+    ...
   },
 ]
 ```
@@ -286,22 +270,5 @@ methods: {
 ```
 
 #### clickNode 点击节点
-
-## setting
-
-|  属性  | 简介                                      |
-| :----: | :---------------------------------------- |
-|  type  | 属性类型 input,select,radio,multiple,time |
-|  name  | 唯一标记属性的名                          |
-| title  | 属性标题                                  |
-| value  | 属性默认值                                |
-| option | select,radio,multiple 类型 的选项         |
-
-### option
-
-| 属性  | 简介 |
-| :---: | :--- |
-|  key  | 键   |
-| value | 值   |
 
 #### 最后附上 Git 地址：https://github.com/LairPaFu/vue-diagram-tree

@@ -1,36 +1,5 @@
 
 <template>
-  <!-- 
-    数据项
-      data : {
-        id: "1",
-        type: "sponsor",
-        sponsor: [/* 显示的内容 */],
-        setting: [/* 设置项 */],
-        ...(其他属性项)
-        children: []
-      }
-    配置项
-      options: [
-        {
-          name: $name,
-          title: "标题",
-          color: "标题颜色",
-          default: {
-            type: $name,
-            $name: [/* 显示的内容 */],
-            setting: [/* 设置项 */],
-            ...(其他属性项)
-          },
-        }
-      ]
-    数据变化
-    changeNode(data) {
-      this.data = data;
-    },
-    点击node
-    clickNode(data)
-  -->
   <div class="diagram-tree-container">
     <div class="diagram-tree">
       <div class="diagram-tree-node">
@@ -98,9 +67,14 @@
             }}
           </div>
         </div>
-        <div v-for="item in selectTree.setting" :key="item.name" class="form">
-          <Inputs :input="item" @change="change"></Inputs>
-        </div>
+        <template v-if="Ddrawer">
+          <div v-for="item in selectTree.setting" :key="item.name" class="form">
+            <Inputs :input="item" @change="change"></Inputs>
+          </div>
+        </template>
+        <template v-else>
+          <slot></slot>
+        </template>
       </div>
     </div>
   </div>
@@ -149,42 +123,12 @@ export default {
     factor: {
       type: Array,
       default: () => {
-        return [
-          {
-            type: "time",
-            name: "time_long",
-            title: "时长（天）",
-            input: [
-              {
-                type: "select",
-                name: "time_chooise",
-                title: "",
-                value: "",
-                option: [
-                  {
-                    key: "<",
-                    value: "小于",
-                  },
-                  {
-                    key: "=",
-                    value: "等于",
-                  },
-                  {
-                    key: ">",
-                    value: "大于",
-                  },
-                ],
-              },
-              {
-                type: "input",
-                name: "time_input",
-                title: "",
-                value: "",
-              },
-            ],
-          },
-        ];
+        return [];
       },
+    },
+    Ddrawer: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
@@ -562,7 +506,7 @@ export default {
       }
     },
     // 删除节点
-    deleteNode( tree) {
+    deleteNode(tree) {
       let index = this.getArray(tree.id);
       let data = JSON.parse(JSON.stringify(this.datas));
       let res = data.children;
@@ -670,18 +614,36 @@ export default {
   width: 100%;
   height: 100%;
 }
-.drawer-mask {
-  float: left;
-  width: 60%;
-  height: 100%;
-  background-color: #00000034;
-  cursor: pointer;
+
+@media all and (min-width: 577px) {
+  .drawer-mask {
+    float: left;
+    width: 60%;
+    height: 100%;
+    background-color: #00000034;
+    cursor: pointer;
+  }
+  .drawer {
+    float: right;
+    width: 40%;
+    height: 100%;
+    background-color: #fff;
+  }
 }
-.drawer {
-  float: right;
-  width: 40%;
-  height: 100%;
-  background-color: #fff;
+@media all and (max-width: 576px) {
+  .drawer-mask {
+    float: left;
+    width: 5%;
+    height: 100%;
+    background-color: #00000034;
+    cursor: pointer;
+  }
+  .drawer {
+    float: right;
+    width: 95%;
+    height: 100%;
+    background-color: #fff;
+  }
 }
 .drawer .title {
   display: flex;
