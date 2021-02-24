@@ -47,7 +47,11 @@
         </div>
         <div class="content">
           <template v-if="tree.type == 'task-node' && tree.factor.length > 0">
-            {{ tree.factor.join(";") }}
+            {{
+              tree.factor.filter((v) => v != "" || v.length > 0).length > 0
+                ? tree.factor.join(" ; ")
+                : "请设置条件"
+            }}
           </template>
           <template
             v-else-if="tree.type == 'task-node' && tree.factor.length == 0"
