@@ -5,7 +5,7 @@
         <div
           class="title"
           :style="{
-            'background-color': tree.color,
+            'background-color': tree.color ? tree.color : '#1890ff',
           }"
         >
           <slot name="title" :tree="tree">
