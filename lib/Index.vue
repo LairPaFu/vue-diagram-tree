@@ -4,7 +4,7 @@
     <div class="diagram-tree">
       <div class="diagram-tree-node">
         <Node
-          :tree="datas"
+          :tree="data"
           :options="options"
           :others="others"
           :disabled="disabled"
@@ -47,8 +47,8 @@ export default {
       default: () => {
         return {
           id: "1",
-          type: "sponsor",
-          sponsor: ["pafu"],
+          name: "sponsor",
+          content: "pafu",
           children: [],
         };
       },
@@ -72,7 +72,6 @@ export default {
   },
   data() {
     return {
-      datas: this.data,
       index: [],
       checkArray: [],
       selectTree: null,
@@ -121,7 +120,7 @@ export default {
     getArray(id) {
       this.checkArray = [];
       this.index = [];
-      this.findIndex(this.datas.children, id);
+      this.findIndex(this.data.children, id);
       let index = this.checkArray;
       this.checkArray = [];
       this.index = [];
@@ -155,7 +154,7 @@ export default {
     addProcessEvent(item) {
       if (this.selectTree != null) {
         if (this.selectTree.id == 1) {
-          let data = JSON.parse(JSON.stringify(this.datas));
+          let data = JSON.parse(JSON.stringify(this.data));
           this.idAdd(data.children, this.selectTree.id);
           let save = JSON.parse(JSON.stringify(data.children));
           data.children = [];
@@ -168,7 +167,7 @@ export default {
           this.changeNode(data);
         } else {
           let index = this.getArray(this.selectTree.id);
-          let data = JSON.parse(JSON.stringify(this.datas));
+          let data = JSON.parse(JSON.stringify(this.data));
           let res = data.children;
           for (let i = 0; i < index.length; i++) {
             if (i >= index.length - 1) {
@@ -199,13 +198,13 @@ export default {
         return v.name == tree.children[0].name;
       })[0];
       if (tree.id == 1) {
-        let data = JSON.parse(JSON.stringify(this.datas));
+        let data = JSON.parse(JSON.stringify(this.data));
         item.id = "1" + (data.children.length + 1);
         data.children.push(item);
         this.changeNode(data);
       } else {
         let index = this.getArray(tree.id);
-        let data = JSON.parse(JSON.stringify(this.datas));
+        let data = JSON.parse(JSON.stringify(this.data));
         let res = data.children;
         for (let i = 0; i < index.length; i++) {
           if (i >= index.length - 1) {
@@ -221,7 +220,6 @@ export default {
     },
     // 数据改变
     changeNode(data) {
-      this.datas = data;
       this.$forceUpdate();
       this.$emit("changeNode", data);
     },
@@ -285,7 +283,7 @@ export default {
         this.changeNode(data);
       } else {
         let index = this.getArray(this.selectTree.id);
-        let data = JSON.parse(JSON.stringify(this.datas));
+        let data = JSON.parse(JSON.stringify(this.data));
         let res = data.children;
         for (let i = 0; i < index.length; i++) {
           if (i >= index.length - 1) {
@@ -300,7 +298,7 @@ export default {
     // 选择优先级
     changeSelect(e) {
       if (this.setNode.id == "1") {
-        let data = JSON.parse(JSON.stringify(this.datas));
+        let data = JSON.parse(JSON.stringify(this.data));
         data.children[e.target.value - 1].index = this.selectTree.index;
         data.children[this.selectTree.index - 1].index = parseInt(
           e.target.value
@@ -317,7 +315,7 @@ export default {
         this.changeNode(data);
       } else {
         let index = this.getArray(this.setNode.id);
-        let data = JSON.parse(JSON.stringify(this.datas));
+        let data = JSON.parse(JSON.stringify(this.data));
         let res = data.children;
         for (let i = 0; i < index.length; i++) {
           if (i >= index.length - 1) {
@@ -345,7 +343,7 @@ export default {
     // 删除节点
     deleteNode(tree) {
       let index = this.getArray(tree.id);
-      let data = JSON.parse(JSON.stringify(this.datas));
+      let data = JSON.parse(JSON.stringify(this.data));
       let res = data.children;
       for (let i = 0; i < index.length; i++) {
         if (index.length > 1) {

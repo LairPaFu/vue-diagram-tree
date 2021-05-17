@@ -72,11 +72,12 @@ methods: {
 
 ### diagram-tree
 
-|   属性   | 简介      | 
-| :------: | :-------|
-|  data    | 数据    | 
-|  options   | 可添加的节点数据 |  
-|  others  | 仅暂时用的节点数据 | 
+|   属性   | 简介      | 默认值
+| :------: | :-------:|:-------
+|  data    | 数据    | (Object){id: "1",name: "sponsor",content: "pafu",children: [],}
+|  options   | 可添加的节点数据 |  (Array)[]
+|  others  | 仅暂时用的节点数据 | (Array)[]
+|  disabled  | 是否禁用状态，默认为 false | (Boolean)false
 
 ### data
 
