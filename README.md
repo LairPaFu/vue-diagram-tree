@@ -78,6 +78,7 @@ methods: {
 |  options   | 可添加的节点数据 |  (Array)[]
 |  others  | 仅暂时用的节点数据 | (Array)[]
 |  disabled  | 是否禁用状态，默认为 false | (Boolean)false
+|  copy  | 是否启用复制，默认为 false | (Boolean)false
 
 ### data
 
@@ -97,6 +98,7 @@ methods: {
 | :-------------: | :------------: |:-------------------|
 |    clickNode    | 点击子节点       | Function(data) {}|
 |   changeNode   | 数据增减变化     | Function(data) {} |
+|   getCopyArr   | 获取复制后的新树状数据  | Function(data) {} |
 
 ### 插槽
 

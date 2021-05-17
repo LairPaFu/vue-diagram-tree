@@ -8,9 +8,12 @@
           :options="options"
           :others="others"
           :disabled="disabled"
+          :copy="copy"
+          :copy_arr="copy_arr"
           @clickNode="clickNode"
           @showOption="showOption"
           @deleteNode="deleteNode"
+          @addCopyCheck="addCopyCheck"
           @addNode="addNode"
         >
           <template v-slot:content="{ tree }">
@@ -29,7 +32,7 @@
       :style="{ height: 60 * (Math.ceil(options / 2) + 1) + 10 + 'px' }"
     >
       <div v-for="(item, index) in options" :key="index">
-        <div @click="addProcessEvent(item)">
+        <div @click.stop="addProcessEvent(item)">
           {{ item.title }}
         </div>
       </div>
@@ -69,6 +72,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    copy: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -77,7 +84,10 @@ export default {
       selectTree: null,
       optionShow: false,
       save: [],
+      copy_arr: [],
       setNode: {},
+      parent: null,
+      checkIn: false,
     };
   },
   components: { Node },
@@ -141,17 +151,19 @@ export default {
         top += event.offsetTop;
       }
       var option = document.getElementsByClassName("add-option")[0];
+      var box = document.getElementsByClassName("diagram-tree-container")[0];
       if (this.optionShow) {
         this.optionShow = false;
         this.selectTree = null;
       }
       this.selectTree = tree;
       this.optionShow = true;
-      option.style.left = left + 25 + "px";
-      option.style.top = top + "px";
+      option.style.left = left - box.offsetLeft + 25 + "px";
+      option.style.top = top - box.offsetTop + "px";
     },
     // 添加子分支
     addProcessEvent(item) {
+      this.optionShow = false;
       if (this.selectTree != null) {
         if (this.selectTree.id == 1) {
           let data = JSON.parse(JSON.stringify(this.data));
@@ -193,7 +205,7 @@ export default {
     },
     // 添加分支
     addNode(tree) {
-      console.log(tree);
+      this.optionShow = false;
       let item = JSON.parse(JSON.stringify(this.options)).filter((v) => {
         return v.name == tree.children[0].name;
       })[0];
@@ -379,12 +391,162 @@ export default {
       }
       this.changeNode(data);
     },
+    // 添加要复制的节点
+    addCopyCheck(tree) {
+      if (this.copy_arr.indexOf(tree.id) == -1) {
+        this.copy_arr.push(tree.id);
+      } else {
+        this.copy_arr.splice(this.copy_arr.indexOf(tree.id), 1);
+      }
+      // let data_arr = [];
+      let newData = JSON.parse(JSON.stringify(this.data));
+      this.setCopyArr(newData);
+      this.handleCopyArr(newData);
+      this.adjustCopy(newData);
+      // this.getCopyArr(newData, data_arr);
+      // // console.log(data_arr);
+      // newData.children = [];
+      // for (let i = 0; i < data_arr.length; i++) {
+      //   this.parent = data_arr[i];
+      //   this.checkIn = false;
+      //   // console.log(JSON.parse(JSON.stringify(newData)), data_arr[i]);
+      //   do {
+      //     this.getParent(this.parent.id);
+      //     this.checkId(this.parent.id, newData);
+      //     // console.log(this.checkIn, JSON.parse(JSON.stringify(this.parent)));
+      //   } while (!this.checkIn);
+      //   // console.log(data_arr[i], this.parent);
+      //   this.insertItem(data_arr[i], this.parent.id, newData, newData);
+      // }
+      // console.log(newData);
+      this.$emit("getCopyArr", newData);
+    },
+    // 标识复制的数据
+    setCopyArr(set_arr) {
+      // console.log(this.copy_arr, set_arr);
+      if (this.copy_arr.indexOf(set_arr.id) != -1) {
+        set_arr.select = true;
+      }
+      for (let i = 0; i < set_arr.children.length; i++) {
+        if (
+          set_arr.children[i].children &&
+          set_arr.children[i].children.length > 0
+        ) {
+          this.setCopyArr(set_arr.children[i]);
+        } else {
+          // console.log(set_arr.children[i].id);
+          if (this.copy_arr.indexOf(set_arr.children[i].id) != -1) {
+            // console.log(set_arr.children[i]);
+            set_arr.children[i].select = true;
+          }
+        }
+      }
+    },
+    // 处理标识完的数据
+    handleCopyArr(set_arr) {
+      // console.log(set_arr);
+      for (let i = 0; i < set_arr.children.length; i++) {
+        if (!set_arr.children[i].select) {
+          let arr = set_arr.children[i].children
+            ? set_arr.children[i].children
+            : [];
+          set_arr.children.splice(i, 1, ...arr);
+          this.handleCopyArr(set_arr);
+        } else {
+          // console.log(set_arr.children[i]);
+          if (
+            set_arr.children[i].children &&
+            set_arr.children[i].children.length > 0
+          ) {
+            this.handleCopyArr(set_arr.children[i]);
+          }
+        }
+      }
+    },
+    // 处理标识完的数据
+    adjustCopy(set_arr) {
+      for (let i = 0; i < set_arr.children.length; i++) {
+        if (set_arr.children[i].select) {
+          delete set_arr.children[i].select;
+        }
+        // console.log(set_arr.children[i]);
+        if (
+          set_arr.children[i].children &&
+          set_arr.children[i].children.length > 0
+        ) {
+          this.adjustCopy(set_arr.children[i]);
+        }
+      }
+    },
+    // 获取复制的数组
+    getCopyArr(arr, get_arr) {
+      for (let i = 0; i < arr.children.length; i++) {
+        if (this.copy_arr.indexOf(arr.children[i].id) != -1) {
+          let new_arr = JSON.parse(JSON.stringify(arr.children[i]));
+          new_arr.children = [];
+          get_arr.push(new_arr);
+        }
+        if (arr.children[i].children && arr.children[i].children.length > 0) {
+          this.getCopyArr(arr.children[i], get_arr);
+        }
+      }
+    },
+    // 获取父节点
+    getParent(id, arr = this.data) {
+      for (let i = 0; i < arr.children.length; i++) {
+        if (arr.children[i].id == id) {
+          this.parent = arr;
+        }
+        if (arr.children[i].children && arr.children[i].children.length > 0) {
+          this.getParent(id, arr.children[i]);
+        }
+      }
+    },
+    // 检查节点存在
+    checkId(id, arr = this.data) {
+      // console.log(id, JSON.parse(JSON.stringify(arr)));
+      if (arr.id == id) {
+        this.checkIn = true;
+      }
+      for (let i = 0; i < arr.children.length; i++) {
+        if (arr.children[i].children && arr.children[i].children.length > 0) {
+          this.checkId(id, arr.children[i]);
+        } else {
+          if (arr.children[i].id == id) {
+            this.checkIn = true;
+          }
+        }
+      }
+    },
+    // 插入子节点
+    insertItem(item, id, default_arr, arr = this.data) {
+      // console.log(item.id, id, arr);
+      if (arr.id == id) {
+        if (!arr.children) {
+          arr.children = [];
+        }
+        this.checkIn = false;
+        this.checkId(item.id, default_arr);
+        // console.log(JSON.parse(JSON.stringify(default_arr)));
+        if (!this.checkIn) {
+          arr.children.push(item);
+          // console.log(JSON.parse(JSON.stringify(arr)));
+        }
+      }
+      for (let i = 0; i < arr.children.length; i++) {
+        // console.log(arr.children[i]);
+        if (arr.children[i].children && arr.children[i].children.length > 0) {
+          this.insertItem(item, id, default_arr, arr.children[i]);
+        }
+      }
+    },
   },
 };
 </script>
 
 <style scoped>
 .diagram-tree-container {
+  position: relative;
   display: inline-block;
   padding: 15px;
 }
@@ -411,9 +573,8 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  max-width: 260px;
-  max-height: 130px;
-  padding: 5px;
+  max-width: 254px;
+  padding: 2px;
   background-color: #fff;
   border-radius: 5px;
   box-shadow: 0 1px 5px #00000026;
@@ -422,7 +583,7 @@ export default {
   float: left;
   width: 115px;
   height: 50px;
-  margin: 5px;
+  margin: 2px;
 }
 .add-option > div > div {
   width: 111px;

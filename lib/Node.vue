@@ -39,6 +39,16 @@
             @click.stop="deleteNode(tree)"
           ></span>
         </div>
+        <div class="checked" v-if="copy && tree.id != '1'">
+          <span
+            class="iconfont"
+            :class="{
+              'icon-duoxuankuang': copy_arr.indexOf(tree.id) == -1,
+              'icon-duoxuankuang1': copy_arr.indexOf(tree.id) != -1,
+            }"
+            @click.stop="addCopyCheck(tree)"
+          ></span>
+        </div>
       </div>
     </div>
     <div
@@ -59,9 +69,12 @@
           :options="options"
           :others="others"
           :disabled="disabled"
+          :copy="copy"
+          :copy_arr="copy_arr"
           @clickNode="clickNode"
           @showOption="showOption"
           @deleteNode="deleteNode"
+          @addCopyCheck="addCopyCheck"
           @addNode="addNode"
         >
           <template v-slot:content="{ tree }">
@@ -89,7 +102,13 @@ export default {
     others: {
       type: Array,
     },
+    copy_arr: {
+      type: Array,
+    },
     disabled: {
+      tpye: Boolean,
+    },
+    copy: {
       tpye: Boolean,
     },
   },
@@ -109,12 +128,13 @@ export default {
     // 添加分支
     addNode(tree) {
       this.$emit("addNode", tree);
-      this.$forceUpdate();
     },
     // 删除节点
     deleteNode(tree) {
       this.$emit("deleteNode", tree);
-      this.$forceUpdate();
+    },
+    addCopyCheck(tree) {
+      this.$emit("addCopyCheck", tree);
     },
   },
 };
@@ -208,7 +228,7 @@ export default {
 }
 .diagram-tree-node-label > div .delete span {
   color: #e6e6e6;
-  font-size: 12px;
+  font-size: 16px;
 }
 .diagram-tree-node-label > div .delete span:hover {
   color: #fff;
@@ -254,6 +274,9 @@ export default {
   text-align: left;
 }
 .diagram-tree-node-label > div > .title {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
   height: 25px;
   line-height: 25px;
   color: #fff;
@@ -261,12 +284,36 @@ export default {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
+.diagram-tree-node-label > div > .title > div:first-child {
+  flex: 1;
+}
+.diagram-tree-node-label > div .checked {
+  z-index: 89;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 25px;
+  height: 25px;
+  line-height: 25px;
+  margin: 0 5px 0 0;
+  text-align: center;
+  color: #fff;
+  cursor: pointer;
+}
+.diagram-tree-node-label > div .checked span {
+  color: #e6e6e6;
+  font-size: 15px;
+}
+.diagram-tree-node-label > div > .title > div input {
+  line-height: 25px;
+}
 .diagram-tree-node-label > div.task-node > .title {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   color: #b9b9b9;
 }
+
 .diagram-tree-node-label > div > .content {
   flex: 1;
   min-height: 40px;

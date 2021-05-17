@@ -1,23 +1,37 @@
 {
-  "id": "2352591",
-  "name": "add",
+  "id": "2552127",
+  "name": "vue-diagram-tree",
   "font_family": "iconfont",
   "css_prefix_text": "icon-",
   "description": "",
   "glyphs": [
     {
-      "icon_id": "2116276",
-      "name": "删除",
-      "font_class": "dustbin_icon",
-      "unicode": "e659",
-      "unicode_decimal": 58969
-    },
-    {
-      "icon_id": "4678342",
+      "icon_id": "527045",
       "name": "add",
       "font_class": "add",
-      "unicode": "e71c",
-      "unicode_decimal": 59164
+      "unicode": "e67b",
+      "unicode_decimal": 59003
+    },
+    {
+      "icon_id": "8966946",
+      "name": "cl-icon-Dustbin",
+      "font_class": "dustbin_icon",
+      "unicode": "e637",
+      "unicode_decimal": 58935
+    },
+    {
+      "icon_id": "1071107",
+      "name": "多选框",
+      "font_class": "duoxuankuang",
+      "unicode": "e68c",
+      "unicode_decimal": 59020
+    },
+    {
+      "icon_id": "1120965",
+      "name": "多选框",
+      "font_class": "duoxuankuang1",
+      "unicode": "e61c",
+      "unicode_decimal": 58908
     }
   ]
 }
