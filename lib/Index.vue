@@ -49,7 +49,7 @@ export default {
       type: Object,
       default: () => {
         return {
-          id: "1",
+          id: 0,
           name: "sponsor",
           content: "pafu",
           children: [],
@@ -88,6 +88,7 @@ export default {
       setNode: {},
       parent: null,
       checkIn: false,
+      id: 0,
     };
   },
   components: { Node },
@@ -117,14 +118,21 @@ export default {
         }
       }
     },
-    // 子节点下id递增
-    idAdd(arr, id) {
-      arr.map((v) => {
-        v.id = id + "1" + v.id.substring(id.length);
-        if (v.hasOwnProperty("children") && v.children.length > 0) {
-          this.idAdd(v.children, id);
+    // id处理
+    handleID() {
+      this.id = 0;
+      this.data.id = 0;
+      this.idAdd(this.data.children);
+    },
+    // 节点id修整
+    idAdd(arr) {
+      for (let i = 0; i < arr.length; i++) {
+        this.id++;
+        arr[i].id = this.id;
+        if (arr[i].children) {
+          this.idAdd(arr[i].children);
         }
-      });
+      }
     },
     // 获得选择node位置数组
     getArray(id) {
@@ -165,19 +173,21 @@ export default {
     addProcessEvent(item) {
       this.optionShow = false;
       if (this.selectTree != null) {
-        if (this.selectTree.id == 1) {
+        if (this.selectTree.id == 0) {
+          this.handleID();
           let data = JSON.parse(JSON.stringify(this.data));
-          this.idAdd(data.children, this.selectTree.id);
           let save = JSON.parse(JSON.stringify(data.children));
           data.children = [];
           let set = JSON.parse(JSON.stringify(this.options)).filter((v) => {
             return v.name == item.name;
           })[0];
-          set.id = this.selectTree.id + "1";
+          this.id++;
+          set.id = this.id;
           set.children = save;
           data.children.push(set);
           this.changeNode(data);
         } else {
+          this.handleID();
           let index = this.getArray(this.selectTree.id);
           let data = JSON.parse(JSON.stringify(this.data));
           let res = data.children;
@@ -191,9 +201,9 @@ export default {
           let set = JSON.parse(JSON.stringify(this.options)).filter((v) => {
             return v.name == item.name;
           })[0];
-          set.id = this.selectTree.id + "1";
+          this.id++;
+          set.id = this.id;
           if (res.hasOwnProperty("children") && res.children.length > 0) {
-            this.idAdd(res.children, this.selectTree.id);
             let save = JSON.parse(JSON.stringify(res.children));
             set.children = save;
           }
@@ -209,9 +219,11 @@ export default {
       let item = JSON.parse(JSON.stringify(this.options)).filter((v) => {
         return v.name == tree.children[0].name;
       })[0];
-      if (tree.id == 1) {
+      this.handleID();
+      if (tree.id == 0) {
         let data = JSON.parse(JSON.stringify(this.data));
-        item.id = "1" + (data.children.length + 1);
+        this.id++;
+        item.id = this.id;
         data.children.push(item);
         this.changeNode(data);
       } else {
@@ -225,132 +237,16 @@ export default {
             res = res[index[i]].children;
           }
         }
-        item.id = res.id + (res.children.length + 1);
+        this.id++;
+        item.id = this.id;
         res.children.push(item);
         this.changeNode(data);
       }
     },
     // 数据改变
     changeNode(data) {
-      this.$forceUpdate();
+      this.handleID();
       this.$emit("changeNode", data);
-    },
-    // 配置改变结果保存
-    saveCheck(setting) {
-      for (let i = 0; i < setting.length; i++) {
-        if (setting[i].type == "input") {
-          this.save.push(setting[i].value);
-        } else if (setting[i].type == "radio") {
-          let value = [];
-          setting[i].option.map((v) => {
-            if (v.key == setting[i].value) {
-              value.push(v);
-            }
-          });
-          if (setting[i].hasOwnProperty("show")) {
-            this.saveCheck(setting[i].show[value[0].key]);
-          }
-          if (value[0].show) {
-            this.save.push(value[0].value);
-          }
-        } else if (setting[i].type == "multiple") {
-          setting[i].value.map((v) => {
-            this.save.push(
-              setting[i].option[setting[i].option.findIndex((j) => j.key == v)]
-                .value
-            );
-          });
-        } else if (setting[i].type == "select") {
-          let value = [];
-          setting[i].option.map((v) => {
-            if (v.key == setting[i].value) {
-              value.push(v);
-            }
-          });
-          this.save.push(value[0].value);
-        } else if (setting[i].type == "time") {
-          this.save.push(setting[i].title);
-          this.saveCheck(setting[i].input);
-        }
-      }
-    },
-    // 配置改变
-    change(option) {
-      this.selectTree.setting[
-        this.selectTree.setting.findIndex((v) => v.name == option.name)
-      ] = option;
-      let save = JSON.parse(JSON.stringify(this.selectTree));
-      this.saveCheck(save.setting);
-      if (this.selectTree.type == "task-node") {
-        this.selectTree.factor = JSON.parse(JSON.stringify(this.save));
-      } else {
-        this.selectTree[this.selectTree.type] = JSON.parse(
-          JSON.stringify(this.save)
-        );
-      }
-      this.save = [];
-      console.log(this.selectTree);
-      if (this.selectTree.id == "1") {
-        let data = JSON.parse(JSON.stringify(this.selectTree));
-        this.changeNode(data);
-      } else {
-        let index = this.getArray(this.selectTree.id);
-        let data = JSON.parse(JSON.stringify(this.data));
-        let res = data.children;
-        for (let i = 0; i < index.length; i++) {
-          if (i >= index.length - 1) {
-            res[index[i]] = JSON.parse(JSON.stringify(this.selectTree));
-          } else {
-            res = res[index[i]].children;
-          }
-        }
-        this.changeNode(data);
-      }
-    },
-    // 选择优先级
-    changeSelect(e) {
-      if (this.setNode.id == "1") {
-        let data = JSON.parse(JSON.stringify(this.data));
-        data.children[e.target.value - 1].index = this.selectTree.index;
-        data.children[this.selectTree.index - 1].index = parseInt(
-          e.target.value
-        );
-        let now = JSON.parse(
-          JSON.stringify(data.children[this.selectTree.index - 1])
-        );
-        data.children[this.selectTree.index - 1] = JSON.parse(
-          JSON.stringify(data.children[e.target.value - 1])
-        );
-        data.children[e.target.value - 1] = now;
-        this.selectTree.index = e.target.value;
-        this.setNode = data;
-        this.changeNode(data);
-      } else {
-        let index = this.getArray(this.setNode.id);
-        let data = JSON.parse(JSON.stringify(this.data));
-        let res = data.children;
-        for (let i = 0; i < index.length; i++) {
-          if (i >= index.length - 1) {
-            res = res[index[i]];
-          } else {
-            res = res[index[i]].children;
-          }
-        }
-        res.children[e.target.value - 1].index = this.selectTree.index;
-        res.children[this.selectTree.index - 1].index = parseInt(
-          e.target.value
-        );
-        let now = JSON.parse(
-          JSON.stringify(res.children[this.selectTree.index - 1])
-        );
-        res.children[this.selectTree.index - 1] = JSON.parse(
-          JSON.stringify(res.children[e.target.value - 1])
-        );
-        res.children[e.target.value - 1] = now;
-        this.selectTree.index = e.target.value;
-        this.setNode = res;
-        this.changeNode(data);
-      }
     },
     // 删除节点
     deleteNode(tree) {
@@ -478,6 +374,7 @@ export default {
         }
       }
     },
+    // (弃用方法)
     // 获取复制的数组
     getCopyArr(arr, get_arr) {
       for (let i = 0; i < arr.children.length; i++) {

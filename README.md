@@ -74,7 +74,7 @@ methods: {
 
 |   属性   | 简介      | 默认值
 | :------: | :-------:|:-------
-|  data    | 数据    | (Object){id: "1",name: "sponsor",content: "pafu",children: [],}
+|  data    | 数据    | (Object){id: 0,name: "sponsor",content: "pafu",children: [],}
 |  options   | 可添加的节点数据 |  (Array)[]
 |  others  | 仅暂时用的节点数据 | (Array)[]
 |  disabled  | 是否禁用状态，默认为 false | (Boolean)false
@@ -84,7 +84,7 @@ methods: {
 
 |   属性   | 简介                                                                                                            | 必填
 | :------: | :-------------------------------------------------------------------------------------------------------------- |  :----
-|    id    | 作为标记节点的唯一 id，以树状结构书写 { id: "1" , children : [ {id: "11"]},{id: "12",children: [{id: "121"}} ]}    | 必填
+|    id    | 作为标记节点的唯一 id，以树状结构书写 { id:1 , children : [ {id: 2]},{id: 3,children: [{id: 4}} ]}    | 必填
 |   name   | 唯一标识 name                                                                                                  |  必填
 |  title  | 树状图标题                                                                                                        | 必填
 |  type  | 类型,默认为添加直接单子节点(当type='branch'，可添加多子节点)                                                       | 
