@@ -119,10 +119,10 @@ export default {
       }
     },
     // id处理
-    handleID() {
+    handleID(arr = this.data) {
       this.id = 0;
-      this.data.id = 0;
-      this.idAdd(this.data.children);
+      arr.id = 0;
+      this.idAdd(arr.children);
     },
     // 节点id修整
     idAdd(arr) {
@@ -315,6 +315,7 @@ export default {
       //   this.insertItem(data_arr[i], this.parent.id, newData, newData);
       // }
       // console.log(newData);
+      this.handleID(newData);
       this.$emit("getCopyArr", newData);
     },
     // 标识复制的数据
