@@ -33,13 +33,13 @@
         >
           <button @click.stop="addNode(tree)">添加分支</button>
         </div>
-        <div class="delete" v-if="tree.id != '1'">
+        <div class="delete" v-if="tree.id != 0">
           <span
             class="iconfont icon-dustbin_icon"
             @click.stop="deleteNode(tree)"
           ></span>
         </div>
-        <div class="checked" v-if="copy && tree.id != '1'">
+        <div class="checked" v-if="copy && tree.id != 0">
           <span
             class="iconfont"
             :class="{
