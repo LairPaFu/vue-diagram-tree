@@ -1,6 +1,6 @@
 {
   "name": "vue-diagram-tree",
-  "version": "0.1.9",
+  "version": "1.1.1",
   "description": "树状关系图",
   "main": "index.js",
   "directories": {

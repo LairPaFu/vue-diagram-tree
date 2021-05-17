@@ -7,74 +7,31 @@
           :tree="datas"
           :options="options"
           :others="others"
-          :factor="factor"
+          :disabled="disabled"
           @clickNode="clickNode"
           @showOption="showOption"
           @deleteNode="deleteNode"
           @addNode="addNode"
-        ></Node>
+        >
+          <template v-slot:content="{ tree }">
+            <slot name="content" :tree="tree"></slot>
+          </template>
+          <template v-slot:title="{ tree }">
+            <slot name="title" :tree="tree"></slot>
+          </template>
+        </Node>
       </div>
     </div>
     <div
+      v-if="!disabled"
       v-show="optionShow"
       class="add-option"
       :style="{ height: 60 * (Math.ceil(options / 2) + 1) + 10 + 'px' }"
     >
       <div v-for="(item, index) in options" :key="index">
-        <div @click="addProcessEvent(item.name)">{{ item.title }}</div>
-      </div>
-      <div>
-        <div @click="addFactor">条件分支</div>
-      </div>
-    </div>
-    <div v-if="selectTree != null && drawer" class="drawer-box">
-      <div class="drawer-mask" @click="drawerClose"></div>
-      <div class="drawer">
-        <div class="title">
-          <template v-if="selectTree.type == 'task-node'">
-            <div>{{ selectTree.title }}</div>
-            <div style="font-size: 14px">
-              <select
-                v-if="setNode"
-                :value="selectTree.index"
-                @change="changeSelect"
-              >
-                <option
-                  v-for="(item, index) in setNode.children"
-                  :key="index + 1"
-                  :value="index + 1"
-                >
-                  优先级 {{ index + 1 }}
-                </option>
-              </select>
-            </div>
-          </template>
-          <div v-else>
-            {{
-              others.filter((v) => {
-                return v.name == selectTree.type;
-              }).length > 0
-                ? others.filter((v) => {
-                    return v.name == selectTree.type;
-                  })[0].title
-                : options.filter((v) => {
-                    return v.name == selectTree.type;
-                  }).length > 0
-                ? options.filter((v) => {
-                    return v.name == selectTree.type;
-                  })[0].title
-                : ""
-            }}
-          </div>
+        <div @click="addProcessEvent(item)">
+          {{ item.title }}
         </div>
-        <template v-if="Ddrawer">
-          <div v-for="item in selectTree.setting" :key="item.name" class="form">
-            <Inputs :input="item" @change="change"></Inputs>
-          </div>
-        </template>
-        <template v-else>
-          <slot></slot>
-        </template>
       </div>
     </div>
   </div>
@@ -82,7 +39,6 @@
 
 <script>
 import Node from "./Node";
-import Inputs from "./components/Input";
 export default {
   name: "diagram-tree",
   props: {
@@ -106,29 +62,12 @@ export default {
     others: {
       type: Array,
       default: () => {
-        return [
-          {
-            name: "sponsor",
-            title: "发起人",
-            color: "#3c3fff",
-            default: {
-              type: "sponsor",
-              sponsor: [],
-              setting: [],
-            },
-          },
-        ];
-      },
-    },
-    factor: {
-      type: Array,
-      default: () => {
         return [];
       },
     },
-    Ddrawer: {
+    disabled: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   data() {
@@ -138,12 +77,11 @@ export default {
       checkArray: [],
       selectTree: null,
       optionShow: false,
-      drawer: false,
       save: [],
       setNode: {},
     };
   },
-  components: { Node, Inputs },
+  components: { Node },
   mounted() {
     // 全局点击
     document.addEventListener("click", (e) => {
@@ -191,27 +129,6 @@ export default {
     },
     // 点击编辑
     clickNode(tree) {
-      this.selectTree = tree;
-      if (this.selectTree.type == "task-node") {
-        let index = this.getArray(this.selectTree.id);
-        let data = JSON.parse(JSON.stringify(this.datas));
-        let res = data.children;
-        for (let i = 0; i < index.length; i++) {
-          if (index.length > 1) {
-            if (i < index.length - 2) {
-              res = res[index[i]].children;
-            } else {
-              res = res[index[i]];
-              break;
-            }
-          } else if (index.length == 1) {
-            res = data;
-          }
-        }
-        this.setNode = res;
-      }
-      console.log(this.selectTree);
-      this.drawer = true;
       this.$emit("clickNode", tree);
     },
     // 点击打开添加选项框
@@ -234,8 +151,8 @@ export default {
       option.style.left = left + 25 + "px";
       option.style.top = top + "px";
     },
-    // 添加流程事件
-    addProcessEvent(event) {
+    // 添加子分支
+    addProcessEvent(item) {
       if (this.selectTree != null) {
         if (this.selectTree.id == 1) {
           let data = JSON.parse(JSON.stringify(this.datas));
@@ -243,8 +160,8 @@ export default {
           let save = JSON.parse(JSON.stringify(data.children));
           data.children = [];
           let set = JSON.parse(JSON.stringify(this.options)).filter((v) => {
-            return v.name == event;
-          })[0].default;
+            return v.name == item.name;
+          })[0];
           set.id = this.selectTree.id + "1";
           set.children = save;
           data.children.push(set);
@@ -261,8 +178,8 @@ export default {
             }
           }
           let set = JSON.parse(JSON.stringify(this.options)).filter((v) => {
-            return v.name == event;
-          })[0].default;
+            return v.name == item.name;
+          })[0];
           set.id = this.selectTree.id + "1";
           if (res.hasOwnProperty("children") && res.children.length > 0) {
             this.idAdd(res.children, this.selectTree.id);
@@ -275,91 +192,16 @@ export default {
         }
       }
     },
-    // 添加条件分支
-    addFactor() {
-      if (this.selectTree != null) {
-        if (this.selectTree.id == 1) {
-          let data = JSON.parse(JSON.stringify(this.datas));
-          this.idAdd(data.children, this.selectTree.id);
-          let save = JSON.parse(JSON.stringify(data.children));
-          data.children = [];
-          data.children.push({
-            id: this.selectTree.id + "1",
-            type: "task-node",
-            title: "条件" + 1,
-            index: 1,
-            factor: [],
-            setting: this.factor,
-            children: save,
-          });
-          data.children.push({
-            id: this.selectTree.id + "2",
-            type: "task-node",
-            title: "条件" + 2,
-            index: 2,
-            factor: [],
-            setting: this.factor,
-          });
-          this.changeNode(data);
-        } else {
-          let index = this.getArray(this.selectTree.id);
-          let data = JSON.parse(JSON.stringify(this.datas));
-          let res = data.children;
-          for (let i = 0; i < index.length; i++) {
-            if (i >= index.length - 1) {
-              res = res[index[i]];
-            } else {
-              res = res[index[i]].children;
-            }
-          }
-          if (res.hasOwnProperty("children") && res.children.length > 0) {
-            this.idAdd(res.children, this.selectTree.id);
-            let save = JSON.parse(JSON.stringify(res.children));
-            res.children = [];
-            res.children.push({
-              id: this.selectTree.id + "1",
-              type: "task-node",
-              title: "条件" + 1,
-              index: 1,
-              factor: [],
-              setting: this.factor,
-              children: save,
-            });
-          } else {
-            res.children = [];
-            res.children.push({
-              id: this.selectTree.id + "1",
-              type: "task-node",
-              title: "条件" + 1,
-              index: 1,
-              factor: [],
-              setting: this.factor,
-            });
-          }
-          res.children.push({
-            id: this.selectTree.id + "2",
-            type: "task-node",
-            title: "条件" + 2,
-            index: 2,
-            factor: [],
-            setting: this.factor,
-          });
-          this.changeNode(data);
-        }
-      }
-    },
-    // 添加条件
+    // 添加分支
     addNode(tree) {
+      console.log(tree);
+      let item = JSON.parse(JSON.stringify(this.options)).filter((v) => {
+        return v.name == tree.children[0].name;
+      })[0];
       if (tree.id == 1) {
         let data = JSON.parse(JSON.stringify(this.datas));
-        data.children.push({
-          id: data.id + (data.children.length + 1),
-          type: "task-node",
-          title: "条件" + (data.children.length + 1),
-          index: data.children.length + 1,
-          factor: [],
-          setting: this.factor,
-        });
+        item.id = "1" + (data.children.length + 1);
+        data.children.push(item);
         this.changeNode(data);
       } else {
         let index = this.getArray(tree.id);
@@ -372,20 +214,15 @@ export default {
             res = res[index[i]].children;
           }
         }
-        res.children.push({
-          id: res.id + (res.children.length + 1),
-          type: "task-node",
-          title: "条件" + (res.children.length + 1),
-          index: res.children.length + 1,
-          factor: [],
-          setting: this.factor,
-        });
+        item.id = res.id + (res.children.length + 1);
+        res.children.push(item);
         this.changeNode(data);
       }
     },
     // 数据改变
     changeNode(data) {
       this.datas = data;
+      this.$forceUpdate();
       this.$emit("changeNode", data);
     },
     // 配置改变结果保存
@@ -542,14 +379,8 @@ export default {
           1
         );
       }
-
       this.changeNode(data);
     },
-    // 关闭遮罩
-    drawerClose(){
-      this.drawer = false
-      this.$emit('drawerClose')
-    }
   },
 };
 </script>
@@ -582,8 +413,8 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  width: 260px;
-  height: 130px;
+  max-width: 260px;
+  max-height: 130px;
   padding: 5px;
   background-color: #fff;
   border-radius: 5px;

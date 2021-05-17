@@ -5,70 +5,33 @@
         <div
           class="title"
           :style="{
-            'background-color':
-              others.filter((v) => {
-                return v.name == tree.type;
-              }).length > 0
-                ? others.filter((v) => {
-                    return v.name == tree.type;
-                  })[0].color
-                : options.filter((v) => {
-                    return v.name == tree.type;
-                  }).length > 0
-                ? options.filter((v) => {
-                    return v.name == tree.type;
-                  })[0].color
-                : '',
+            'background-color': tree.color,
           }"
         >
-          <template v-if="tree.type == 'task-node'">
-            <div>
-              {{ tree.title }}
-            </div>
-            <div>优先级{{ tree.index }}</div>
-          </template>
-          <span v-else>
-            {{
-              options.filter((v) => {
-                return v.name == tree.type;
-              }).length > 0
-                ? options.filter((v) => {
-                    return v.name == tree.type;
-                  })[0].title
-                : others.filter((v) => {
-                    return v.name == tree.type;
-                  }).length
-                ? others.filter((v) => {
-                    return v.name == tree.type;
-                  })[0].title
-                : ""
-            }}
-          </span>
+          <slot name="title" :tree="tree">
+            {{ tree.title }}
+          </slot>
         </div>
         <div class="content">
-          <template v-if="tree.type == 'task-node' && tree.factor.length > 0">
-            {{
-              tree.factor.filter((v) => v != "" || v.length > 0).length > 0
-                ? tree.factor.join(" ; ")
-                : "请设置条件"
-            }}
-          </template>
-          <template
-            v-else-if="tree.type == 'task-node' && tree.factor.length == 0"
-          >
-            请设置条件
-          </template>
-          <span v-else>
-            {{ tree[tree.type].join("，") }}
-          </span>
+          <slot name="content" :tree="tree">
+            {{ tree.content }}
+          </slot>
         </div>
-        <div class="add">
+        <div v-if="!disabled" class="add">
           <button @click.stop="showOption($event, tree)">
             <span class="iconfont icon-add"></span>
           </button>
         </div>
-        <div v-if="tree.children && tree.children.length > 1" class="factor">
-          <button @click.stop="addNode(tree)">添加条件</button>
+        <div
+          v-if="
+            !disabled &&
+            tree.children &&
+            tree.children[0] &&
+            tree.children[0].type == 'branch'
+          "
+          class="factor"
+        >
+          <button @click.stop="addNode(tree)">添加分支</button>
         </div>
         <div class="delete" v-if="tree.id != '1'">
           <span
@@ -95,12 +58,19 @@
           :tree="item"
           :options="options"
           :others="others"
-          :factor="factor"
+          :disabled="disabled"
           @clickNode="clickNode"
           @showOption="showOption"
           @deleteNode="deleteNode"
           @addNode="addNode"
-        ></Node>
+        >
+          <template v-slot:content="{ tree }">
+            <slot name="content" :tree="tree"></slot>
+          </template>
+          <template v-slot:title="{ tree }">
+            <slot name="title" :tree="tree"></slot>
+          </template>
+        </Node>
       </div>
     </div>
   </div>
@@ -119,15 +89,14 @@ export default {
     others: {
       type: Array,
     },
-    factor: {
-      tpye: Object,
+    disabled: {
+      tpye: Boolean,
     },
   },
   data() {
     return {};
   },
   components: {},
-
   methods: {
     // 点击编辑
     clickNode(tree) {
@@ -137,13 +106,15 @@ export default {
     showOption(e, tree) {
       this.$emit("showOption", e, tree);
     },
-    // 添加条件
+    // 添加分支
     addNode(tree) {
       this.$emit("addNode", tree);
+      this.$forceUpdate();
     },
     // 删除节点
     deleteNode(tree) {
       this.$emit("deleteNode", tree);
+      this.$forceUpdate();
     },
   },
 };
