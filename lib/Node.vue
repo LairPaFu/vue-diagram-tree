@@ -5,7 +5,11 @@
         <div
           class="title"
           :style="{
-            'background-color': tree.color ? tree.color : '#1890ff',
+            'background-color': tree.color
+              ? tree.color
+              : tree.id == 0
+              ? '#3c3fff'
+              : '#1890ff',
           }"
         >
           <slot name="title" :tree="tree">
@@ -27,7 +31,7 @@
             !disabled &&
             tree.children &&
             tree.children[0] &&
-            tree.children[0].type == 'branch'
+            tree.children[0].type != 'once'
           "
           class="factor"
         >
