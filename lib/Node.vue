@@ -37,7 +37,7 @@
         >
           <button @click.stop="addNode(tree)">添加分支</button>
         </div>
-        <div class="delete" v-if="tree.id != 0">
+        <div class="delete" v-if="tree.id != 0 && !disabled">
           <span
             class="iconfont icon-dustbin_icon"
             @click.stop="deleteNode(tree)"
